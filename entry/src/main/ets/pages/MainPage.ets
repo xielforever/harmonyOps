@@ -1,5 +1,6 @@
 import { Theme } from '../theme/Theme';
 import { DashboardTab } from './dashboard/DashboardTab';
+import { TerminalTab } from './terminal/TerminalTab';
 import { AlertsTab } from './alerts/AlertsTab';
 import { ScriptsTab } from './scripts/ScriptsTab';
 
@@ -32,9 +33,7 @@ struct MainPage {
       }.tabBar(this.TabBuilder('概览', 0))
 
       TabContent() {
-        Column() {
-          Text('Terminal Placeholder').fontColor(Theme.TEXT_PRIMARY)
-        }.width('100%').height('100%').backgroundColor(Theme.BACKGROUND)
+        TerminalTab()
       }.tabBar(this.TabBuilder('终端', 1))
 
       TabContent() {
