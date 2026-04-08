@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "settingPage",
+      "value": "配置"
+    },
+    {
+      "name": "return",
+      "value": "返回"
+    },
+    {
+      "name": "pageSettingParam",
+      "value": "页面设置参数"
+    }
+  ]
+}
