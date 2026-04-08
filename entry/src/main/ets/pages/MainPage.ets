@@ -1,4 +1,5 @@
 import { Theme } from '../theme/Theme';
+import { DashboardTab } from './dashboard/DashboardTab';
 
 @Entry
 @Component
@@ -25,9 +26,7 @@ struct MainPage {
   build() {
     Tabs({ barPosition: BarPosition.End, controller: this.tabsController }) {
       TabContent() {
-        Column() {
-          Text('Dashboard Placeholder').fontColor(Theme.TEXT_PRIMARY)
-        }.width('100%').height('100%').backgroundColor(Theme.BACKGROUND)
+        DashboardTab()
       }.tabBar(this.TabBuilder('概览', 0))
 
       TabContent() {
