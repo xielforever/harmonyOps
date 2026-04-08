@@ -21,6 +21,9 @@ struct LoginPage {
   // 账号登录状态 (Account Login State)
   @State account: string = '';
   @State accountPassword: string = '';
+  
+  // 记住我
+  @State rememberMe: boolean = false;
 
   async handleLogin() {
     if (this.isLoggingIn) return;
@@ -79,167 +82,205 @@ struct LoginPage {
 
         console.info('HarmonyOps', 'Sending auth request to ' + this.selectedCloud, JSON.stringify(payload));
 
-        // TODO: 这里替换为真实的 @ohos.net.http 华为云/腾讯云鉴权逻辑
-        // 模拟验证：密码必须不为空（上层已校验），这里假设返回成功
         resolve({ success: true, message: 'ok' });
       }, 1000);
     });
   }
 
-  @Builder TabBuilder(title: string, index: number) {
+  @Builder CloudProviderCard(name: string, iconText: string, isSelected: boolean) {
     Column() {
-      Text(title)
-        .fontColor(this.currentTabIndex === index ? Theme.PRIMARY : Theme.TEXT_SECONDARY)
-        .fontSize(16)
-        .fontWeight(this.currentTabIndex === index ? FontWeight.Bold : FontWeight.Normal)
+      Text(iconText).fontSize(28).margin({ bottom: 8 })
+      Text(name)
+        .fontSize(12)
+        .fontColor(isSelected ? Theme.TEXT_PRIMARY : Theme.TEXT_SECONDARY)
+        .fontWeight(FontWeight.Bold)
+    }
+    .width(80)
+    .height(80)
+    .justifyContent(FlexAlign.Center)
+    .backgroundColor(Theme.SURFACE_0)
+    .borderRadius(8)
+    .border({ width: 2, color: isSelected ? Theme.PRIMARY : Theme.SURFACE_2, style: BorderStyle.Solid })
+    .onClick(() => { this.selectedCloud = name; })
+  }
+
+  @Builder InputField(label: string, placeholder: string, textValue: string, isPassword: boolean = false, onChange: (val: string) => void) {
+    Column() {
+      Text(label)
+        .fontSize(14)
+        .fontColor(Theme.TEXT_SECONDARY)
+        .width('100%')
         .margin({ bottom: 8 })
       
-      if (this.currentTabIndex === index) {
-        Divider()
-          .color(Theme.PRIMARY)
-          .strokeWidth(2)
-          .width(40)
-      } else {
-        Divider()
-          .color(Color.Transparent)
-          .strokeWidth(2)
-          .width(40)
-      }
+      TextInput({ placeholder: placeholder, text: textValue })
+        .type(isPassword ? InputType.Password : InputType.Normal)
+        .placeholderColor(Theme.TEXT_SECONDARY)
+        .fontColor(Theme.TEXT_PRIMARY)
+        .backgroundColor(Theme.SURFACE_0)
+        .border({ width: 1, color: Theme.SURFACE_2, style: BorderStyle.Solid })
+        .borderRadius(8)
+        .height(52)
+        .width('100%')
+        .onChange(onChange)
     }
-    .width('100%')
-    .padding({ top: 16 })
-    .onClick(() => {
-      this.currentTabIndex = index;
-    })
+    .margin({ bottom: 20 })
   }
 
   build() {
-    Column() {
-      // Logo / 标题区域
+    Scroll() {
       Column() {
-        Text('HarmonyOps')
-          .fontSize(32)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(Theme.TEXT_PRIMARY)
-          .margin({ bottom: 8 })
-        Text('运维助手')
-          .fontSize(16)
-          .fontColor(Theme.TEXT_SECONDARY)
-      }
-      .margin({ top: 80, bottom: 40 })
-      .alignItems(HorizontalAlign.Center)
-
-      // 登录卡片
-      Column() {
-        // 云服务商下拉选择
+        // Top Navigation Bar
         Row() {
-          Text('云服务商')
-            .fontColor(Theme.TEXT_PRIMARY)
-            .fontSize(14)
-          Select([{ value: '华为云' }, { value: '腾讯云' }])
-            .selected(0)
-            .value(this.selectedCloud)
-            .font({ size: 14 })
-            .fontColor(Theme.TEXT_PRIMARY)
-            .selectedOptionFont({ size: 14 })
-            .optionFont({ size: 14 })
-            .backgroundColor(Theme.SURFACE_2)
-            .onSelect((index: number, value: string) => {
-              this.selectedCloud = value;
-            })
+          Row() {
+            Text('←').fontColor(Theme.TEXT_SECONDARY).fontSize(20).margin({ right: 8 })
+            Text('Back').fontColor(Theme.TEXT_SECONDARY).fontSize(16)
+          }
+          
+          Row() {
+            Text('>_').fontColor(Theme.PRIMARY).fontSize(16).fontWeight(FontWeight.Bold).margin({ right: 8 })
+              .backgroundColor(Theme.SURFACE_2).padding(4).borderRadius(4)
+            Text('HarmonyOps').fontColor(Theme.TEXT_PRIMARY).fontSize(18).fontWeight(FontWeight.Bold)
+          }
         }
         .width('100%')
-        .padding({ left: 24, right: 24, top: 16 })
         .justifyContent(FlexAlign.SpaceBetween)
+        .margin({ top: 20, bottom: 40 })
 
-        Tabs({ barPosition: BarPosition.Start }) {
-          // 模式 1: 租户登录
-          TabContent() {
-            Column() {
-              TextInput({ placeholder: '主账号', text: this.masterAccount })
-                .placeholderColor(Theme.TEXT_SECONDARY)
-                .fontColor(Theme.TEXT_PRIMARY)
-                .backgroundColor(Theme.SURFACE_2)
-                .height(48)
-                .margin({ bottom: 16 })
-                .onChange((value: string) => { this.masterAccount = value })
-
-              TextInput({ placeholder: '子账号', text: this.subAccount })
-                .placeholderColor(Theme.TEXT_SECONDARY)
-                .fontColor(Theme.TEXT_PRIMARY)
-                .backgroundColor(Theme.SURFACE_2)
-                .height(48)
-                .margin({ bottom: 16 })
-                .onChange((value: string) => { this.subAccount = value })
-
-              TextInput({ placeholder: '密码', text: this.tenantPassword })
-                .type(InputType.Password)
-                .placeholderColor(Theme.TEXT_SECONDARY)
-                .fontColor(Theme.TEXT_PRIMARY)
-                .backgroundColor(Theme.SURFACE_2)
-                .height(48)
-                .margin({ bottom: 24 })
-                .onChange((value: string) => { this.tenantPassword = value })
-
-              Button(this.isLoggingIn ? '登录中...' : '登录')
-                .width('100%')
-                .height(48)
-                .backgroundColor(Theme.PRIMARY)
-                .fontColor(Theme.TEXT_PRIMARY)
-                .onClick(() => this.handleLogin())
-            }
-            .padding(24)
+        // Hero Text
+        Column() {
+          Text('Welcome Back')
+            .fontSize(36)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(Theme.TEXT_PRIMARY)
+            .margin({ bottom: 12 })
             .width('100%')
-          }.tabBar(this.TabBuilder('租户登录', 0))
-
-          // 模式 2: 账号登录
-          TabContent() {
-            Column() {
-              TextInput({ placeholder: '账号', text: this.account })
-                .placeholderColor(Theme.TEXT_SECONDARY)
-                .fontColor(Theme.TEXT_PRIMARY)
-                .backgroundColor(Theme.SURFACE_2)
-                .height(48)
-                .margin({ bottom: 16 })
-                .onChange((value: string) => { this.account = value })
-
-              TextInput({ placeholder: '密码', text: this.accountPassword })
-                .type(InputType.Password)
-                .placeholderColor(Theme.TEXT_SECONDARY)
-                .fontColor(Theme.TEXT_PRIMARY)
-                .backgroundColor(Theme.SURFACE_2)
-                .height(48)
-                .margin({ bottom: 24 })
-                .onChange((value: string) => { this.accountPassword = value })
-
-              Button(this.isLoggingIn ? '登录中...' : '登录')
-                .width('100%')
-                .height(48)
-                .backgroundColor(Theme.PRIMARY)
-                .fontColor(Theme.TEXT_PRIMARY)
-                .onClick(() => this.handleLogin())
-            }
-            .padding(24)
+            .textAlign(TextAlign.Center)
+          Text('Log in to your tenant account')
+            .fontSize(16)
+            .fontColor(Theme.TEXT_SECONDARY)
             .width('100%')
-          }.tabBar(this.TabBuilder('账号登录', 1))
+            .textAlign(TextAlign.Center)
         }
-        .onChange((index: number) => {
-          this.currentTabIndex = index;
-        })
-        .barMode(BarMode.Fixed)
-        .barWidth('100%')
-        .barHeight(56)
-        .backgroundColor(Color.Transparent)
+        .margin({ bottom: 40 })
+
+        // Custom Tabs (Tenant Login / Account Login)
+        Row() {
+          Column() {
+            Text('Tenant Login (租户)')
+              .fontColor(this.currentTabIndex === 0 ? Theme.TEXT_PRIMARY : Theme.TEXT_SECONDARY)
+              .fontSize(16)
+              .fontWeight(this.currentTabIndex === 0 ? FontWeight.Bold : FontWeight.Normal)
+              .margin({ bottom: 12 })
+            Divider()
+              .color(this.currentTabIndex === 0 ? Theme.PRIMARY : Theme.SURFACE_2)
+              .strokeWidth(this.currentTabIndex === 0 ? 3 : 1)
+          }
+          .layoutWeight(1)
+          .onClick(() => this.currentTabIndex = 0)
+
+          Column() {
+            Text('Account Login (账号)')
+              .fontColor(this.currentTabIndex === 1 ? Theme.TEXT_PRIMARY : Theme.TEXT_SECONDARY)
+              .fontSize(16)
+              .fontWeight(this.currentTabIndex === 1 ? FontWeight.Bold : FontWeight.Normal)
+              .margin({ bottom: 12 })
+            Divider()
+              .color(this.currentTabIndex === 1 ? Theme.PRIMARY : Theme.SURFACE_2)
+              .strokeWidth(this.currentTabIndex === 1 ? 3 : 1)
+          }
+          .layoutWeight(1)
+          .onClick(() => this.currentTabIndex = 1)
+        }
+        .width('100%')
+        .margin({ bottom: 32 })
+
+        // Cloud Provider Selector
+        Column() {
+          Text('SELECT CLOUD PROVIDER')
+            .fontSize(12)
+            .fontColor(Theme.TEXT_SECONDARY)
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .margin({ bottom: 16 })
+          
+          Row() {
+            this.CloudProviderCard('华为云', '☁️', this.selectedCloud === '华为云')
+            Blank().width(16)
+            this.CloudProviderCard('腾讯云', '☁️', this.selectedCloud === '腾讯云')
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.Start)
+        }
+        .margin({ bottom: 32 })
+
+        // Forms
+        if (this.currentTabIndex === 0) {
+          this.InputField('Main Account ID (主账号)', 'e.g. OBS-8829-01', this.masterAccount, false, (val) => { this.masterAccount = val })
+          this.InputField('Sub-account / Username (子账号)', 'admin_devops', this.subAccount, false, (val) => { this.subAccount = val })
+          this.InputField('Password (密码)', '', this.tenantPassword, true, (val) => { this.tenantPassword = val })
+        } else {
+          this.InputField('Account (账号)', 'Enter your account', this.account, false, (val) => { this.account = val })
+          this.InputField('Password (密码)', '', this.accountPassword, true, (val) => { this.accountPassword = val })
+        }
+
+        // Remember Me & Forgot Password
+        Row() {
+          Row() {
+            Checkbox({ name: 'remember', group: 'login' })
+              .select(this.rememberMe)
+              .selectedColor(Theme.PRIMARY)
+              .onChange((value: boolean) => { this.rememberMe = value })
+              .width(20).height(20).margin({ right: 8 })
+            Text('Remember tenant')
+              .fontSize(14)
+              .fontColor(Theme.TEXT_SECONDARY)
+          }
+          
+          Text('Forgot password?')
+            .fontSize(14)
+            .fontColor(Theme.PRIMARY)
+        }
+        .width('100%')
+        .justifyContent(FlexAlign.SpaceBetween)
+        .margin({ bottom: 32 })
+
+        // Submit Button
+        Button() {
+          Row() {
+            Text('→] ').fontColor('#000000').fontSize(18).fontWeight(FontWeight.Bold).margin({ right: 8 })
+            Text(this.isLoggingIn ? 'Signing in...' : 'Sign in to Console')
+              .fontColor('#000000')
+              .fontSize(16)
+              .fontWeight(FontWeight.Bold)
+          }
+          .justifyContent(FlexAlign.Center)
+          .width('100%')
+        }
+        .type(ButtonType.Normal)
+        .borderRadius(8)
+        .width('100%')
+        .height(52)
+        .backgroundColor(Theme.PRIMARY)
+        .onClick(() => this.handleLogin())
+
+        // Footer
+        Row() {
+          Text('🛡 SECURE INFRASTRUCTURE ENVIRONMENT')
+            .fontSize(10)
+            .fontColor(Theme.TEXT_SECONDARY)
+            .letterSpacing(1)
+            .fontWeight(FontWeight.Bold)
+        }
+        .margin({ top: 40, bottom: 40 })
+        .width('100%')
+        .justifyContent(FlexAlign.Center)
+
       }
-      .width('90%')
-      .backgroundColor(Theme.SURFACE_1)
-      .borderRadius(Theme.BORDER_RADIUS)
-      .border({ width: Theme.BORDER_WIDTH, color: Theme.SURFACE_2, style: BorderStyle.Solid })
-      .margin({ bottom: 40 })
+      .padding({ left: 24, right: 24 })
+      .width('100%')
     }
     .width('100%')
     .height('100%')
     .backgroundColor(Theme.BACKGROUND)
-    .alignItems(HorizontalAlign.Center)
   }
 }
