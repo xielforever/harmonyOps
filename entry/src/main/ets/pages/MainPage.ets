@@ -1,6 +1,7 @@
 import { Theme } from '../theme/Theme';
 import { DashboardTab } from './dashboard/DashboardTab';
 import { AlertsTab } from './alerts/AlertsTab';
+import { ScriptsTab } from './scripts/ScriptsTab';
 
 @Entry
 @Component
@@ -41,9 +42,7 @@ struct MainPage {
       }.tabBar(this.TabBuilder('告警', 2))
 
       TabContent() {
-        Column() {
-          Text('Scripts Placeholder').fontColor(Theme.TEXT_PRIMARY)
-        }.width('100%').height('100%').backgroundColor(Theme.BACKGROUND)
+        ScriptsTab()
       }.tabBar(this.TabBuilder('工具', 3))
     }
     .scrollable(false)
