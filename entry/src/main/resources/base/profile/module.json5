@@ -5,6 +5,10 @@
       "pageSourceFile"  : "src/main/ets/pages/Index.ets"
     },
     {
+      "name" : "LoginPage",
+      "pageSourceFile"  : "src/main/ets/pages/LoginPage.ets"
+    },
+    {
       "name" : "MainPage",
       "pageSourceFile"  : "src/main/ets/pages/MainPage.ets"
     }

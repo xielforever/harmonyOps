@@ -5,7 +5,7 @@ import { Theme } from '../theme/Theme';
 @Component
 struct Index {
   onPageShow() {
-    router.replaceUrl({ url: 'pages/MainPage' });
+    router.replaceUrl({ url: 'pages/LoginPage' });
   }
 
   build() {
